@@ -1,4 +1,5 @@
 import 'package:prak1/prak1.dart' as prak1;
+
 const String name = "Raymon"; // sama seperti var (lebih baik jika langsung di tentukan)
 const int age = 20;
 
@@ -18,7 +19,7 @@ void main(List<String> arguments) {
   // const String name = "Yanto"; // jika begini maka yang diambil adalah name yang di dalam main, bukan yang di luar main
   final String nama = "Yanto";
   final int umur =21;
-  // nama = "Raymon Devtant"; tidak bisa diubah karena nama adalah final
+  // nama = "Raymon"; tidak bisa diubah karena nama adalah final
   print('Nama saya $name, umur saya $age tahun');
   print('Nama saya $nama, umur saya $umur tahun');
 }
