@@ -1,9 +1,21 @@
 # Week 6
 Membuat project baru
-![alt text](Documentation/BuatProjectBaru.png)
+![alt text](screenshots/BuatProjectBaru.png)
 
 Download package
-![alt text](Documentation/Package.png)
+![alt text](screenshots/Package.png)
 
 Create Struktur Folder
-![alt text](Documentation/StrukturFolder.png)
+![alt text](screenshots/StrukturFolder.png)
+
+Tema Terang
+![alt text](screenshots/TemaTerang.png)
+
+Tema Gelap
+![alt text](screenshots/TemaGelap.png)
+
+Terakhir Dibuka
+![alt text](screenshots/TerakhirDibuka.png)
+
+TerakhirDibukaDanTemaGelap
+![alt text](screenshots/TerakhirBukaGelap.png)
