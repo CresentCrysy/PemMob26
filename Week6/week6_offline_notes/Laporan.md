@@ -113,3 +113,11 @@ Tabel per bandingan storage
 | Cocok untuk 1000+ catatan? | TIDAK | BISA (Terbatas) | Sangat Cocok | Sangat Cocok |		
 | Keputusan | DIPILIH untuk Preferensi Tema | TIDAK DIPILIH | TIDAK DIPILIH | DIPILIH untuk 1000+ Catatan |
 | Alasan | Sangat ringan, berbasis key-value sederhana, dan tidak memerlukan setup skema database. Rapuh dan lambat jika digunakan menyimpan koleksi data besar | Bisa untuk kedua kebutuhan, tapi menyimpan 1000+ catatan di memori (RAM) akan memberatkan perangkat. Query/filtering teks dan relasi tag harus dilakukan manual | Mendukung dataset besar di disk, tapi kurang fleksibel karena tanpa type-safety (raw SQL string) dan perlu wrapper manual untuk mendukung stream/reaktivitas UI | Mendukung query relasional & indeksasi SQLite secara efisien di disk, dilengkapi fitur watch() stream reaktif out-of-the-box, serta jaminan type-safety saat kompilasi |
+
+Pertanyaan Refleksi
+1. Karena sharedPreferences dirancang khusus untuk menyimpan data pasangan key-value sederhana (seperti konfigurasi, tema, atau flag status login), bukan untuk struktur data relasional/kompleks seperti daftar catatan. 
+   Dampak jika di langgar: Kurangnya fitur query, performa buruk dan blocking ui, resiko data corrupt
+2. Chace first cukup jika data jarang berubah, kapan butuh strategi lain seperti network first yaitu saat data sering berubah ubah/realtime contoh nya untuk perubahan nilai mata uang 
+3. Proses sinkronisasi dieksekusi di background secara asinkron (misalnya melalui Riverpod FutureProvider/StateNotifier atau worker thread). UI langsung diperbarui dari DB lokal tanpa perlu menunggu response jaringan.
+   Kapan tabel outbox jadi perlu Saat tindakan pengguna melibatkan payload khusus, lampiran file/gambar, atau beberapa endpoint API yang harus dikirim bertahap sesuai urutan kejadian (Event Sourcing/Transactional Outbox Pattern).
+4. Untuk kasus saya hampir semua saran dari AI tidak saya tolak
