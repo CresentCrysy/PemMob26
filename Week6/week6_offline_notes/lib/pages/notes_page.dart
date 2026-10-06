@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
- 
+
 import '../data/local/note.dart';
+import '../data/sync.dart';
 import '../providers/note_providers.dart';
 import '../widgets/note_form_dialog.dart';
+import '../widgets/note_tile.dart';
+import 'posts_page.dart';
 import 'settings_page.dart';
- 
+
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
- 
+
   Future<void> _openForm(
     BuildContext context,
     WidgetRef ref, [
@@ -28,12 +31,12 @@ class NotesPage extends ConsumerWidget {
       );
     }
   }
- 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notesAsync = ref.watch(notesProvider);
     final dirty = ref.watch(dirtyCountProvider).value ?? 0;
- 
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Offline Notes'),
@@ -45,6 +48,30 @@ class NotesPage extends ConsumerWidget {
               label: Text('$dirty'),
               child: const Icon(Icons.cloud_upload_outlined),
             ),
+          ),
+          IconButton(
+            tooltip: 'Posts (cache-first)',
+            icon: const Icon(Icons.article_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PostsPage()),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Sinkronkan',
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                final count = await ref.read(noteActionsProvider).sync();
+                messenger.showSnackBar(SnackBar(
+                  content: Text(count == 0
+                      ? 'Semua catatan sudah tersinkron'
+                      : '$count catatan berhasil disinkronkan'),
+                ));
+              } on OfflineException catch (e) {
+                messenger.showSnackBar(SnackBar(content: Text(e.message)));
+              }
+            },
           ),
           IconButton(
             tooltip: 'Pengaturan',
@@ -68,24 +95,11 @@ class NotesPage extends ConsumerWidget {
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final note = notes[index];
-              return ListTile(
-                leading: Icon(
-                  note.dirty ? Icons.cloud_off : Icons.cloud_done,
-                  color: note.dirty ? Colors.orange : Colors.green,
-                ),
-                title: Text(note.title),
-                subtitle: Text(
-                  note.body.isEmpty ? '(tanpa isi)' : note.body,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              return NoteTile(
+                note: note,
                 onTap: () => _openForm(context, ref, note),
-                trailing: IconButton(
-                  tooltip: 'Hapus',
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () =>
-                      ref.read(noteActionsProvider).delete(note.id!),
-                ),
+                onDelete: () =>
+                    ref.read(noteActionsProvider).delete(note.id!),
               );
             },
           );
@@ -99,10 +113,10 @@ class NotesPage extends ConsumerWidget {
     );
   }
 }
- 
+
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
- 
+
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -117,13 +131,13 @@ class _EmptyView extends StatelessWidget {
     );
   }
 }
- 
+
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
- 
+
   final String message;
   final VoidCallback onRetry;
- 
+
   @override
   Widget build(BuildContext context) {
     return Center(
